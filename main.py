@@ -2,14 +2,13 @@ HELP = """
 /help - посмотреть справку всей программы.
 /add - добавить задачу в список.
 /show - показать список задач.
-/exit - выйти из программы.
-/delete_task - удалить задачу из списка.
-/delete_all - удалить все задачи из списка."""
+/delete_task - удалить одну задачу.
+/delete_date - удалить все задачи по дате.
+/delete_all - удалить все задачи.
+/exit - выйти из программы."""
 
 class Commands:
-    tasks_now = []
-    tasks_tomorrow = []
-    tasks_other = []
+    tasks = dict()
 
     def __init__(self, command: str) -> None:
         self.command = command
@@ -17,39 +16,34 @@ class Commands:
     def print_help(self)-> None:
         print(HELP)
 
-    def add_task(self, task: str, date: str) -> None:
-        if date.lower() == 'сегодня':
-            self.tasks_now.append(task)
-        elif date.lower() == 'завтра':
-            self.tasks_tomorrow.append(task)
+    def add_task(self, date: str, task: str) -> None:
+        if date in self.tasks:
+            self.tasks[date].append(task)
         else:
-            self.tasks_other.append(task)
+            self.tasks[date] = [task]
         print(f"Задача '{task}' добавлена на {date}.")
 
     def show_tasks(self)-> None:
-        counter = 1
-        print('Задачи на сегодня:')
-        for task in self.tasks_now:
-            print(f'{counter}. {task}')
-            counter += 1
-        counter = 1
-        print('Задачи на завтра:')
-        for task in self.tasks_tomorrow:
-            print(f'{counter}. {task}')
-            counter += 1
-        counter = 1
-        print('Задачи в других дня:')
-        for task in self.tasks_other:
-            print(f'{counter}. {task}')
-            counter += 1
-        counter = 1
+        for key, value in self.tasks.items():
+            print(key)
+            counter = 1
+            for task in value:
+                print(f'{counter}. {task}')
+                counter += 1
+            counter = 1
 
-    def delete_task(self, id_task: int) -> None:
-        task = self.tasks.pop(id_task - 1)
+    def delete_task(self, task: str) -> None:
+        if task in self.tasks.values():
+            for task in self.tasks.values():
+                if task == task:
+                    self.tasks.pop(task)
         print(f"Задача '{task}' удалена.")
     
+    def delete_date(self, date: str) -> None:
+        self.tasks.pop(date)
+    
     def delete_all(self) -> None:
-        del self.tasks[:]
+        self.tasks.clear()
         print("Все задачи удалены.")
 
 if __name__ == '__main__':
@@ -59,18 +53,26 @@ if __name__ == '__main__':
     while comand != "exit":
         if comand == "help":
             commands.print_help()
+            print('-' * 40)
         elif comand == "add":
-            date = input("Введите день (сегодня / завтра / любой): ")
+            date = input("Введите дату (ДД-ММ-ГГГГ): ")
             task = input("Введите задачу: ")
-            commands.add_task(task, date)
+            commands.add_task(date, task)
+            print('-' * 40)
         elif comand == "show":
             commands.show_tasks()
-            print()
+            print('-' * 40)
         elif comand == "delete_task":
-            id_task = int(input("Введите номер задачи: "))
-            commands.delete_task(id_task)
+            task = input("Введите задачу для удаления: ")
+            commands.delete_task(task)
+            print('-' * 40)
+        elif comand == "delete_date":
+            date = input("Введите дату для удаления всех задач в ней: ")
+            commands.delete_date(date)
+            print('-' * 40)
         elif comand == "delete_all":
             commands.delete_all()
+            print('-' * 40)
         else:
             print("Нет такой команды.")
         comand = input("Введите команду: ")
